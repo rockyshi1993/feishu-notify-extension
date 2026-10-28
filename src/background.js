@@ -2,7 +2,7 @@
 // Grok Bot receiver. All state lives in chrome.storage.local so a restarted worker resumes.
 import {
   normalizeConfig, classify, eventKey, isDuplicate, shouldKeepTitleEvent, enqueue, takeBatch,
-  buildPayload, classifyResponse, isWorkTime, nextWorkStart, formatClock, exportConfig, importConfig,
+  buildPayload, classifyResponse, nextAuthPaused, isWorkTime, nextWorkStart, formatClock, exportConfig, importConfig,
 } from './lib/core.js';
 
 const EXT_VERSION = chrome.runtime.getManifest().version;
@@ -104,7 +104,7 @@ async function flush(reason, attempt = 1) {
     state.droppedSinceLast = 0;
     log(state, cfg, { kind: 'sent', note: `${batch.length} event(s), HTTP ${res.status}` });
   } else if (verdict === 'auth') {
-    state.authPaused = true; // contract C1: stop auto-push until settings are fixed
+    state.authPaused = nextAuthPaused(state.authPaused, verdict); // contract C1
     log(state, cfg, { kind: 'error', note: `HTTP ${res.status}: key rejected, auto-push paused` });
   } else {
     log(state, cfg, { kind: 'error', note: `send failed (${res.status || res.error}), attempt ${attempt}` });
@@ -156,7 +156,8 @@ async function testPush() {
   const res = await post(cfg, payload);
   const verdict = classifyResponse(res);
   state.lastSend = { at: Date.now(), count: 0, ok: verdict === 'ok', status: res.status, error: res.error || null, test: true };
-  if (verdict === 'ok') state.authPaused = false; // a working key lifts the C1 pause
+  // C1: a test push that gets 401/403 pauses auto-push too; a 2xx lifts the pause.
+  state.authPaused = nextAuthPaused(state.authPaused, verdict);
   log(state, cfg, { kind: 'test', note: `HTTP ${res.status || res.error}` });
   await saveState(state);
   await updateBadge(cfg, state);

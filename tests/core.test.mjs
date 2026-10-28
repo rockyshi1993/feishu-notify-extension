@@ -166,3 +166,10 @@ test('export never contains the key; import keeps local key', () => {
   assert.throws(() => c.importConfig({ schemaVersion: 9, config: {} }, k));
   assert.equal(c.mask('crsr_abcdef'), '••••cdef');
 });
+
+test('auth pause state (C1, A06 2.8)', () => {
+  assert.equal(c.nextAuthPaused(false, 'auth'), true);
+  assert.equal(c.nextAuthPaused(true, 'retry'), true);
+  assert.equal(c.nextAuthPaused(false, 'retry'), false);
+  assert.equal(c.nextAuthPaused(true, 'ok'), false);
+});

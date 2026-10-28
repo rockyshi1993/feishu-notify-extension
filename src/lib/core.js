@@ -295,6 +295,16 @@ export function classifyResponse(res) {
   return 'retry';
 }
 
+/**
+ * Contract C1: any 401/403 (batch or test push) pauses auto-push; a 2xx lifts the pause;
+ * other failures leave it unchanged. Saving settings also lifts it (handled by the caller).
+ */
+export function nextAuthPaused(prev, verdict) {
+  if (verdict === 'auth') return true;
+  if (verdict === 'ok') return false;
+  return prev;
+}
+
 /** Export config without the key (contract §4). */
 export function exportConfig(cfg, now = new Date()) {
   const { apiKey, ...rest } = cfg; // eslint-disable-line no-unused-vars
