@@ -1,0 +1,13 @@
+{
+  "name": "feishu-notify-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome extension that pushes Feishu web message notices to a Grok Bot receiver.",
+  "scripts": {
+    "test": "node --test tests/",
+    "check": "node scripts/check.mjs",
+    "build": "sh scripts/build.sh"
+  },
+  "license": "UNLICENSED"
+}
