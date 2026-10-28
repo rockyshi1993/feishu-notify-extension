@@ -32,7 +32,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   focusedChatPolicy: 'push',
   workHours: { mon: WORKDAY, tue: WORKDAY, wed: WORKDAY, thu: WORKDAY, fri: WORKDAY, sat: null, sun: null },
   timezone: 'Asia/Shanghai',
-  batchWindowMin: 2,
+  batchWindowMin: 1,
   batchMax: 20,
   dedupeWindowMin: 10,
   queueMax: 200,
@@ -145,7 +145,9 @@ export function parseNotification(title, body) {
   const b = String(body || '').trim();
   const m = /^([^:：\n]{1,40})[:：]\s*([\s\S]*)$/.exec(b);
   if (m) return { chatName: t || null, sender: m[1].trim(), text: m[2], chatType: 'group' };
-  return { chatName: t || null, sender: null, text: b, chatType: t ? 'dm' : 'unknown' };
+  // DM notifications carry the peer's name as the title and plain text as the body,
+  // so the chat name is also the sender (A06 step 5).
+  return { chatName: t || null, sender: t || null, text: b, chatType: t ? 'dm' : 'unknown' };
 }
 
 const TYPE_PATTERNS = {

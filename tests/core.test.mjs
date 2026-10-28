@@ -174,3 +174,49 @@ test('auth pause state (C1, A06 2.8)', () => {
   assert.equal(c.nextAuthPaused(false, 'retry'), false);
   assert.equal(c.nextAuthPaused(true, 'ok'), false);
 });
+
+// A06 static verification (steps 6-14, 2.7). See 证据/A06-结果.md.
+test('A06 static: batch window default is 1 minute and 1 is allowed', () => {
+  assert.equal(c.DEFAULT_CONFIG.batchWindowMin, 1);
+  assert.equal(c.normalizeConfig({ batchWindowMin: 1 }).errors.length, 0);
+  assert.deepEqual(c.normalizeConfig({ batchWindowMin: 0 }).errors, ['batchWindowMin']);
+});
+
+test('A06 static step 5: DM sender falls back to chat name', () => {
+  const dm = c.classify(n('周智祥', '插件测试 5（上下文）'), cfg(), WED_10).event;
+  assert.equal(dm.sender, '周智祥');
+  assert.equal(dm.chatName, '周智祥');
+  assert.equal(c.parseNotification('', 'x').sender, null);
+});
+
+test('A06 static step 6: three group messages merge into one batch', () => {
+  const k = cfg();
+  const q = [];
+  for (let i = 0; i < 3; i++) c.enqueue(q, c.classify(n('测试群', `张三: 消息${i}`, { at: WED_10.getTime() + i }), k, WED_10).event, k.queueMax);
+  const { batch, rest } = c.takeBatch(q, k.batchMax);
+  assert.equal(batch.length, 3);
+  assert.equal(rest.length, 0);
+  assert.deepEqual(batch.map((e) => e.body), ['消息0', '消息1', '消息2']);
+});
+
+test('A06 static steps 7-8: keyword and @mention jump the queue', () => {
+  const k = cfg();
+  const q = [n('测试群', '张三: 普通'), n('测试群', '张三: 新任务来了'), n('测试群', '张三: @石火坚 看下')]
+    .map((r, i) => c.classify({ ...r, at: WED_10.getTime() + i }, k, WED_10).event);
+  assert.deepEqual(q[1].marks, ['priority', 'keyword:任务']);
+  assert.deepEqual(q[2].marks, ['priority', 'mentionMe']);
+  assert.deepEqual(c.takeBatch(q, 20).batch.map((e) => e.body), ['新任务来了', '@石火坚 看下', '普通']);
+});
+
+test('A06 static step 10: recall notice in a DM is dropped by default', () => {
+  assert.equal(c.classify(n('周智祥', '周智祥撤回了一条消息'), cfg(), WED_10).drop, 'type-recall');
+});
+
+test('A06 static steps 12-14: outside hours mark, includeText off', () => {
+  const early = cfg({ workHours: { ...c.DEFAULT_CONFIG.workHours, wed: { start: '09:00', end: '09:30' } } });
+  assert.ok(c.classify(n('测试群', '张三: hi'), early, WED_10).event.marks.includes('outsideHours'));
+  const off = c.classify(n('测试群', '张三: 秘密'), cfg({ includeText: false }), WED_10).event;
+  assert.equal(off.body, '');
+  assert.equal(off.sender, '张三');
+  assert.ok(c.normalizeConfig({ snoozeUntil: new Date(WED_10.getTime() + 3600e3).toISOString() }).config.snoozeUntil);
+});
