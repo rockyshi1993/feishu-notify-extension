@@ -192,7 +192,7 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   const run = (fn) => { locked(async () => reply(await fn())); return true; };
   if (msg && msg.type === 'feishu-event') { locked(() => onEvent(msg.event)); return false; }
   // Everything else is only accepted from the extension's own pages, never from content scripts.
-  if (sender.tab || !String(sender.url || '').startsWith(chrome.runtime.getURL(''))) return false;
+  if (sender.id !== chrome.runtime.id || !String(sender.url || '').startsWith(chrome.runtime.getURL(''))) return false;
   switch (msg && msg.type) {
     case 'test-push': return run(testPush);
     case 'status': return run(status);
