@@ -60,7 +60,8 @@ test('filters: exclude, include-only, senders, types, chat types', () => {
 test('muted, focused chat, mentions, regex', () => {
   assert.equal(c.classify(n('静音群', 'a: b', { muted: true }), cfg(), WED_10).drop, 'muted'); // D1
   assert.ok(c.classify(n('静音群', 'a: b', { muted: true }), cfg({ mutedChats: 'all' }), WED_10).event);
-  assert.equal(c.classify(n('群A', 'a: b', { focused: true, activeChat: '群A' }), cfg(), WED_10).drop, 'focusedChat'); // D4
+  assert.ok(c.classify(n('群A', 'a: b', { focused: true, activeChat: '群A' }), cfg(), WED_10).event); // A06 step 4: default is now push
+  assert.equal(c.classify(n('群A', 'a: b', { focused: true, activeChat: '群A' }), cfg({ focusedChatPolicy: 'skip' }), WED_10).drop, 'focusedChat'); // D4 opt-in
   assert.ok(c.classify(n('群A', 'a: b', { focused: false, activeChat: '群A' }), cfg(), WED_10).event);
   assert.deepEqual(c.classify(n('群', 'a: @石火坚 看下'), cfg(), WED_10).event.marks, ['priority', 'mentionMe']);
   assert.deepEqual(c.classify(n('群', 'a: @石火坚 看下'), cfg({ mentionMe: 'normal' }), WED_10).event.marks, ['mentionMe']);

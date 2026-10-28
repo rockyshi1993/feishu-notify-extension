@@ -29,7 +29,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   includeText: true,
   titleFallback: true,
   captureWhenOff: false,
-  focusedChatPolicy: 'skip',
+  focusedChatPolicy: 'push',
   workHours: { mon: WORKDAY, tue: WORKDAY, wed: WORKDAY, thu: WORKDAY, fri: WORKDAY, sat: null, sun: null },
   timezone: 'Asia/Shanghai',
   batchWindowMin: 2,
