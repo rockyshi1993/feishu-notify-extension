@@ -46,8 +46,12 @@ dedupe window, queue limit, log size). Export/import produces `feishu-notify-con
 ## Limits
 - Matching is by visible names (chat title, sender prefix): renamed or same-named chats can be mismatched.
 - Muted chats usually raise no notification, so they can only show up as an anonymous unread-count bump.
-- Context and focused-chat detection use undocumented page markup and may read nothing after Feishu UI changes;
-  the push still goes out with `contextAvailable: false`.
+- Context and focused-chat detection use undocumented page markup (`.chat-tabPanel-active .js-message-item`,
+  bubble text in `.message-right`). Feishu web shows no readable chat-header name, so a notification counts as
+  "open chat" when its body (or the part after `Sender:`) appears in one of the last 5 message bubbles; the
+  check retries at 300 ms and 1200 ms. Group sender names are not read (null); in DMs the sender is the chat
+  name, own messages are `me`. After Feishu UI changes this may read nothing; the push still goes out with
+  `contextAvailable: false`.
 - The relay stores one flag (`__feishuNotifyExtCfg`) in Feishu's localStorage so the page script sees it at startup.
 
 ## Privacy

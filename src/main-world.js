@@ -30,32 +30,73 @@
     } catch (_) { /* ignore */ }
     return false;
   }
-  function recentMessages(limit) {
+  // Real Feishu web markup (probed 2026-10-28): the open chat is `.chat-tabPanel-active`, each message is
+  // `.js-message-item` (with `message-self` / `message-not-self`), its bubble text lives in `.message-right`.
+  // No chat-header name element was found, so "open chat" is inferred by matching the notification body
+  // against the newest message bubbles. Old guessed selectors are kept as fallbacks.
+  const MSG_SELS = ['.chat-tabPanel-active .js-message-item', '.js-message-item',
+    '[class*="message-item"], [class*="messageItem"], [class*="MessageItem"]'];
+  const ctx = () => globalThis.__feishuNotifyCtxMatch;
+  function messageNodes() {
+    for (const s of MSG_SELS) { const n = document.querySelectorAll(s); if (n.length) return [...n]; }
+    return [];
+  }
+  function bubbleText(n) {
+    return text(n.querySelector('.message-right')) || text(n.querySelector('.message-content'))
+      || text(n.querySelector('[class*="content"], [class*="text"]')) || text(n);
+  }
+  function recentTexts(limit) {
+    try { return messageNodes().slice(-limit).map(bubbleText).filter(Boolean); } catch (_) { return []; }
+  }
+  function recentMessages(limit, p2pName) {
     try {
-      const nodes = document.querySelectorAll('[class*="message-item"], [class*="messageItem"], [class*="MessageItem"]');
       const out = [];
-      for (const n of [...nodes].slice(-limit)) {
-        const sender = text(n.querySelector('[class*="name"], [class*="sender"]')) || null;
-        const body = text(n.querySelector('[class*="content"], [class*="text"]')) || text(n);
+      for (const n of messageNodes().slice(-limit)) {
+        const cl = n.classList;
+        // Group sender names were not present in the probe; fall back to old guesses, then to known cases.
+        let sender = text(n.querySelector('[class*="sender"], [class*="name"]')) || null;
+        if (!sender && cl && cl.contains('message-self')) sender = 'me';
+        else if (!sender && cl && cl.contains('message-is-p2p') && cl.contains('message-not-self')) sender = p2pName || null;
+        const body = bubbleText(n);
         if (body) out.push({ sender, text: body.slice(0, 1000) });
       }
       return out.length ? out : null;
     } catch (_) { return null; }
   }
+  function isOpenChat(title, body) {
+    try {
+      const m = ctx();
+      if (m && m.matchesOpenChat(body, recentTexts(5))) return true;
+      const legacy = activeChatName();
+      return !!legacy && legacy === title;
+    } catch (_) { return false; }
+  }
 
   function emitNotification(title, options) {
     const t = String(title || '');
-    const active = activeChatName();
+    const b = String((options && options.body) || '');
+    const at = Date.now();
     const focused = document.visibilityState === 'visible' && document.hasFocus();
-    window.postMessage({
+    const post = (open) => window.postMessage({
       source: TAG, kind: 'event',
       event: {
-        via: 'notification', title: t, body: String((options && options.body) || ''), at: Date.now(),
-        focused, activeChat: active, muted: isMuted(t),
+        via: 'notification', title: t, body: b, at,
+        focused, activeChat: open ? t : null, muted: isMuted(t),
         // Context is only readable when the notified chat is the one open in the page.
-        context: active && active === t ? recentMessages(10) : null,
+        context: open ? recentMessages(10, t) : null,
       },
     }, '*');
+    // The message list may render slightly after the Notification call: check now, then retry
+    // at 300 ms and 1200 ms before posting exactly one event.
+    let done = false;
+    const attempt = (final) => {
+      if (done) return;
+      const open = isOpenChat(t, b);
+      if (open || final) { done = true; post(open); }
+    };
+    try { attempt(false); } catch (_) { /* ignore */ }
+    setTimeout(() => { try { attempt(false); } catch (_) { /* ignore */ } }, 300);
+    setTimeout(() => { try { attempt(true); } catch (_) { if (!done) { done = true; post(false); } } }, 1200);
   }
 
   const Real = window.Notification;
