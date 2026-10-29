@@ -3,11 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Chrome extension that pushes Feishu web message notices to a Grok Bot receiver.",
+  "description": "飞书网页新消息通知 Chrome 扩展：过滤、合并后推送到 Webhook，只通知不操作。",
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs",
     "build": "sh scripts/build.sh"
   },
-  "license": "UNLICENSED"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockyshi1993/feishu-notify-extension.git"
+  },
+  "homepage": "https://github.com/rockyshi1993/feishu-notify-extension#readme",
+  "bugs": {
+    "url": "https://github.com/rockyshi1993/feishu-notify-extension/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }
