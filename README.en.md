@@ -101,7 +101,7 @@ Node.js ≥ 20, no dependencies: `npm test` · `npm run check` (syntax, manifest
 
 ## Contributing
 
-Issues and pull requests are welcome. Please run `npm test` and `npm run check` first; code comments and commit messages are in English.
+Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Report security issues privately per [SECURITY.md](SECURITY.md). Please run `npm test` and `npm run check` first; code comments and commit messages are in English.
 
 ## License
 

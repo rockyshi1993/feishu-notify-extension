@@ -1,0 +1,50 @@
+name: 问题反馈
+description: 报告扩展的错误或异常行为
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 感谢反馈！请勿填写密钥、接收地址或未脱敏的聊天内容。
+  - type: input
+    id: version
+    attributes:
+      label: 扩展版本
+      placeholder: 例如 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: chrome
+    attributes:
+      label: Chrome 版本
+      placeholder: 例如 131.0.6778.86
+    validations:
+      required: true
+  - type: input
+    id: domain
+    attributes:
+      label: 飞书网页域名
+      placeholder: 例如 xxx.feishu.cn
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: 调试日志
+      description: 弹窗「最近事件」中的相关条目，请去掉密钥和敏感聊天内容。
+      render: text

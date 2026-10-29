@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全问题
+    url: https://github.com/rockyshi1993/feishu-notify-extension/security/advisories/new
+    about: 请通过私密漏洞报告提交安全问题，不要公开发 Issue。

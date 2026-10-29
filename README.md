@@ -170,7 +170,7 @@ npm run build    # 生成 dist/ 下的解压目录和 zip 包
 
 ## 参与贡献
 
-欢迎提交 Issue 和 Pull Request。提交前请确保 `npm test` 和 `npm run check` 通过；代码注释和提交信息请使用英文。飞书页面结构变化导致抓取失效时，欢迎附上（脱敏后的）页面结构信息。
+欢迎提交 Issue 和 Pull Request，流程见 [CONTRIBUTING.md](CONTRIBUTING.md)；安全问题请按 [SECURITY.md](SECURITY.md) 私密报告。提交前请确保 `npm test` 和 `npm run check` 通过；代码注释和提交信息请使用英文。飞书页面结构变化导致抓取失效时，欢迎附上（脱敏后的）页面结构信息。
 
 ## 许可证
 
