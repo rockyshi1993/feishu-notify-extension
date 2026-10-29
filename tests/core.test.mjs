@@ -45,7 +45,7 @@ test('parse and classify basics', () => {
 });
 
 test('filters: exclude, include-only, senders, types, chat types', () => {
-  assert.equal(c.classify(n('CICD 构建群', 'bot: done @石火坚'), cfg({ excludeChats: ['cicd'] }), WED_10).drop, 'excludeChats'); // D2
+  assert.equal(c.classify(n('CICD 构建群', 'bot: done @张三'), cfg({ excludeChats: ['cicd'] }), WED_10).drop, 'excludeChats'); // D2
   assert.equal(c.classify(n('其他群', 'a: b'), cfg({ includeOnlyChats: ['项目'] }), WED_10).drop, 'includeOnlyChats');
   assert.ok(c.classify(n('项目群', 'a: b'), cfg({ includeOnlyChats: ['项目'] }), WED_10).event);
   assert.equal(c.classify(n('群', '张三: hi'), cfg({ excludeSenders: ['张三'] }), WED_10).drop, 'excludeSenders');
@@ -63,8 +63,12 @@ test('muted, focused chat, mentions, regex', () => {
   assert.ok(c.classify(n('群A', 'a: b', { focused: true, activeChat: '群A' }), cfg(), WED_10).event); // A06 step 4: default is now push
   assert.equal(c.classify(n('群A', 'a: b', { focused: true, activeChat: '群A' }), cfg({ focusedChatPolicy: 'skip' }), WED_10).drop, 'focusedChat'); // D4 opt-in
   assert.ok(c.classify(n('群A', 'a: b', { focused: false, activeChat: '群A' }), cfg(), WED_10).event);
-  assert.deepEqual(c.classify(n('群', 'a: @石火坚 看下'), cfg(), WED_10).event.marks, ['priority', 'mentionMe']);
-  assert.deepEqual(c.classify(n('群', 'a: @石火坚 看下'), cfg({ mentionMe: 'normal' }), WED_10).event.marks, ['mentionMe']);
+  assert.deepEqual(c.classify(n('群', 'a: @张三 看下'), cfg({ myName: '张三' }), WED_10).event.marks, ['priority', 'mentionMe']);
+  assert.deepEqual(c.classify(n('群', 'a: @张三 看下'), cfg({ myName: '张三', mentionMe: 'normal' }), WED_10).event.marks, ['mentionMe']);
+  // Empty myName (the default) disables @me detection instead of matching everything.
+  assert.equal(c.DEFAULT_CONFIG.myName, '');
+  assert.deepEqual(c.classify(n('群', 'a: @张三 看下'), cfg(), WED_10).event.marks, []);
+  assert.deepEqual(c.classify(n('群', 'a: 邮件 a@b.com'), cfg({ myName: '' }), WED_10).event.marks, []);
   assert.deepEqual(c.classify(n('群', 'a: @所有人 开会'), cfg(), WED_10).event.marks, ['mentionAll']);
   assert.equal(c.classify(n('群', 'a: @所有人 开会'), cfg({ mentionAll: 'ignore' }), WED_10).drop, 'mentionAll-ignore');
   assert.deepEqual(c.classify(n('群', 'a: BUG-12'), cfg({ priorityKeywords: ['^a\\nbug'], useRegex: true }), WED_10).event.marks, []);
@@ -200,12 +204,12 @@ test('A06 static step 6: three group messages merge into one batch', () => {
 });
 
 test('A06 static steps 7-8: keyword and @mention jump the queue', () => {
-  const k = cfg();
-  const q = [n('测试群', '张三: 普通'), n('测试群', '张三: 新任务来了'), n('测试群', '张三: @石火坚 看下')]
+  const k = cfg({ myName: '张三' });
+  const q = [n('测试群', '张三: 普通'), n('测试群', '张三: 新任务来了'), n('测试群', '张三: @张三 看下')]
     .map((r, i) => c.classify({ ...r, at: WED_10.getTime() + i }, k, WED_10).event);
   assert.deepEqual(q[1].marks, ['priority', 'keyword:任务']);
   assert.deepEqual(q[2].marks, ['priority', 'mentionMe']);
-  assert.deepEqual(c.takeBatch(q, 20).batch.map((e) => e.body), ['新任务来了', '@石火坚 看下', '普通']);
+  assert.deepEqual(c.takeBatch(q, 20).batch.map((e) => e.body), ['新任务来了', '@张三 看下', '普通']);
 });
 
 test('A06 static step 10: recall notice in a DM is dropped by default', () => {

@@ -10,7 +10,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   enabled: true,
   snoozeUntil: null,
   instanceName: '',
-  myName: '石火坚',
+  myName: '', // empty disables @me detection
   excludeChats: [],
   includeOnlyChats: [],
   excludeSenders: [],

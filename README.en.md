@@ -30,7 +30,7 @@ The extension UI is in Simplified Chinese. Below, UI labels are given in Chinese
 | Group | Setting (UI label → config key) | Default |
 | --- | --- | --- |
 | 连接 Connection | 接收地址 URL `endpointUrl` (https only) · 密钥 key `apiKey` (empty = keep saved) · 实例名称 instance name `instanceName` (empty → `chrome-<first 4 of instanceId>`) · 启用 enabled `enabled` | empty · empty · empty · on |
-| 来源过滤 Source filters | 我的飞书名字 `myName` (for `@me`) | `石火坚` — **change to your own name** |
+| 来源过滤 Source filters | 我的飞书名字 `myName` (for `@me`, e.g. `张三`) | empty — **@me detection only works when this is filled in; empty turns it off** |
 | | 排除会话 `excludeChats` · 只看这些会话 `includeOnlyChats` · 排除发送人 `excludeSenders` (one per line, case-insensitive substring) | empty |
 | | 机器人 / 助手发送人 `botSenders` | `多维表格助手` |
 | | 机器人消息 `botPolicy`: pass / mark / drop | mark |
