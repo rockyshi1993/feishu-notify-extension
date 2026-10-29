@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Feishu Notify – Settings</title>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>飞书通知 – 设置</title>
 <style>
 body{font:14px system-ui,sans-serif;max-width:760px;margin:16px auto;padding:0 12px}
 fieldset{margin:12px 0;border:1px solid #ddd;border-radius:6px}legend{font-weight:600}
@@ -7,48 +7,49 @@ label{display:block;margin:6px 0}input[type=text],input[type=url],input[type=pas
 textarea{height:56px}.row{display:flex;gap:8px;align-items:center}.row input{width:auto}
 .err{color:#d93025}#status{margin-left:8px}table{border-collapse:collapse}td{padding:2px 6px}
 </style></head><body>
-<h1>Feishu Notify – Settings</h1>
-<fieldset><legend>Connection</legend>
-<label>Grok Bot receiver URL <input id="endpointUrl" type="url" placeholder="https://…"></label>
-<label>Key (sent as <code>Authorization: Bearer …</code>) <input id="apiKey" type="password" autocomplete="off" placeholder="leave empty to keep the saved key"></label>
+<h1>飞书通知 – 设置</h1>
+<fieldset><legend>连接</legend>
+<label>Grok Bot 接收地址 <input id="endpointUrl" type="url" placeholder="https://…"></label>
+<label>密钥（以 <code>Authorization: Bearer …</code> 发送） <input id="apiKey" type="password" autocomplete="off" placeholder="留空则保留已保存的密钥"></label>
 <div id="keyHint"></div>
-<label>Instance name <input id="instanceName" type="text" placeholder="e.g. rocky-chrome"></label>
-<label class="row"><input id="enabled" type="checkbox"> Enabled</label>
+<label>实例名称 <input id="instanceName" type="text" placeholder="例如 office-chrome"></label>
+<label class="row"><input id="enabled" type="checkbox"> 启用</label>
 </fieldset>
-<fieldset><legend>Source filters</legend>
-<label>My Feishu name (for @me) <input id="myName" type="text"></label>
-<label>Exclude chats (one per line, substring) <textarea id="excludeChats"></textarea></label>
-<label>Only these chats (empty = all) <textarea id="includeOnlyChats"></textarea></label>
-<label>Exclude senders <textarea id="excludeSenders"></textarea></label>
-<label>Bot / assistant senders <textarea id="botSenders"></textarea></label>
-<label>Bot messages <select id="botPolicy"><option value="mark">pass and mark</option><option value="pass">pass</option><option value="drop">drop</option></select></label>
-<label>Muted chats <select id="mutedChats"><option value="followFeishu">follow Feishu (not pushed)</option><option value="all">push anyway</option><option value="none">also drop unread-count events</option></select></label>
-<label>@me <select id="mentionMe"><option value="priority">priority</option><option value="normal">normal</option></select></label>
-<label>@all <select id="mentionAll"><option value="normal">normal</option><option value="priority">priority</option><option value="ignore">ignore</option></select></label>
-<div class="row"><label class="row"><input id="ct_dm" type="checkbox"> Direct messages</label><label class="row"><input id="ct_group" type="checkbox"> Group chats</label></div>
-<div class="row">Ignore: <label class="row"><input id="it_recall" type="checkbox"> recalls</label><label class="row"><input id="it_reaction" type="checkbox"> reactions</label><label class="row"><input id="it_system" type="checkbox"> system notices</label></div>
-<label class="row"><input id="titleFallback" type="checkbox"> Use tab-title unread count as fallback</label>
-<label class="row"><input id="captureWhenOff" type="checkbox"> Capture even when Chrome notifications are off for Feishu</label>
-<label>Chat currently open and focused <select id="focusedChatPolicy"><option value="push">push</option><option value="skip">do not push</option></select></label>
+<fieldset><legend>来源过滤</legend>
+<label>我的飞书名字（用于识别 @我） <input id="myName" type="text"></label>
+<label>排除会话（每行一个，按名称包含匹配） <textarea id="excludeChats"></textarea></label>
+<label>只看这些会话（留空 = 全部） <textarea id="includeOnlyChats"></textarea></label>
+<label>排除发送人 <textarea id="excludeSenders"></textarea></label>
+<label>机器人 / 助手发送人 <textarea id="botSenders"></textarea></label>
+<label>机器人消息 <select id="botPolicy"><option value="mark">放行并标记</option><option value="pass">放行</option><option value="drop">丢弃</option></select></label>
+<label>免打扰会话 <select id="mutedChats"><option value="followFeishu">跟随飞书（不推送）</option><option value="all">照样推送</option><option value="none">连未读数事件也丢弃</option></select></label>
+<label>@我 <select id="mentionMe"><option value="priority">优先</option><option value="normal">普通</option></select></label>
+<label>@所有人 <select id="mentionAll"><option value="normal">普通</option><option value="priority">优先</option><option value="ignore">忽略</option></select></label>
+<div class="row"><label class="row"><input id="ct_dm" type="checkbox"> 单聊</label><label class="row"><input id="ct_group" type="checkbox"> 群聊</label></div>
+<div class="row">忽略：<label class="row"><input id="it_recall" type="checkbox"> 撤回</label><label class="row"><input id="it_reaction" type="checkbox"> 表情回复</label><label class="row"><input id="it_system" type="checkbox"> 系统消息</label></div>
+<label class="row"><input id="titleFallback" type="checkbox"> 用标签页标题里的未读数兜底</label>
+<label class="row"><input id="captureWhenOff" type="checkbox"> 飞书的 Chrome 通知被关闭时也照样抓取</label>
+<label>当前打开且在前台的会话 <select id="focusedChatPolicy"><option value="push">推送</option><option value="skip">不推送</option></select></label>
 </fieldset>
-<fieldset><legend>Content</legend>
-<label>Priority keywords <textarea id="priorityKeywords"></textarea></label>
-<label>Ignore keywords <textarea id="ignoreKeywords"></textarea></label>
-<label class="row"><input id="useRegex" type="checkbox"> Keywords are regular expressions</label>
-<label>Max body characters <input id="bodyMaxChars" type="number" min="50" max="1000"></label>
-<label>Context messages <input id="contextCount" type="number" min="0" max="10"></label>
-<label class="row"><input id="includeText" type="checkbox"> Include message text in pushes</label>
+<fieldset><legend>内容</legend>
+<label>优先关键词 <textarea id="priorityKeywords"></textarea></label>
+<label>忽略关键词 <textarea id="ignoreKeywords"></textarea></label>
+<label class="row"><input id="useRegex" type="checkbox"> 关键词按正则表达式匹配</label>
+<label>正文最大字数 <input id="bodyMaxChars" type="number" min="50" max="1000"></label>
+<label>上下文消息条数 <input id="contextCount" type="number" min="0" max="10"></label>
+<label class="row"><input id="includeText" type="checkbox"> 推送中包含消息原文</label>
 </fieldset>
-<fieldset><legend>Timing</legend>
-<label>Time zone <input id="timezone" type="text"></label>
+<fieldset><legend>时间</legend>
+<label>时区 <input id="timezone" type="text"></label>
+<div>工作时间（勾选的日子按起止时间计算，未勾选为休息日）</div>
 <table id="hours"></table>
-<label>Batch window (min) <input id="batchWindowMin" type="number" min="1" max="30"></label>
-<label>Max events per push <input id="batchMax" type="number" min="1" max="20"></label>
-<label>Dedupe window (min) <input id="dedupeWindowMin" type="number" min="1" max="60"></label>
-<label>Queue limit (oldest dropped when full) <input id="queueMax" type="number" min="20" max="1000"></label>
-<label>Debug log size <input id="debugLogSize" type="number" min="0" max="100"></label>
+<label>合并等待时间（分钟） <input id="batchWindowMin" type="number" min="1" max="30"></label>
+<label>每次推送最多条数 <input id="batchMax" type="number" min="1" max="20"></label>
+<label>去重时间窗（分钟） <input id="dedupeWindowMin" type="number" min="1" max="60"></label>
+<label>队列上限（满了丢弃最旧的） <input id="queueMax" type="number" min="20" max="1000"></label>
+<label>调试日志条数 <input id="debugLogSize" type="number" min="0" max="100"></label>
 </fieldset>
-<p><button id="save">Save</button> <button id="test">Send test push</button> <button id="export">Export</button> <button id="importBtn">Import</button><input id="importFile" type="file" accept="application/json" hidden><span id="status"></span></p>
+<p><button id="save">保存</button> <button id="test">发送测试推送</button> <button id="export">导出</button> <button id="importBtn">导入</button><input id="importFile" type="file" accept="application/json" hidden><span id="status"></span></p>
 <p id="errors" class="err"></p>
 <script type="module" src="options.js"></script>
 </body></html>

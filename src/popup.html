@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Feishu Notify</title>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>飞书通知</title>
 <style>body{font:13px system-ui,sans-serif;width:340px;margin:10px}h2{font-size:14px;margin:8px 0 4px}
 button{margin:2px 2px 2px 0}ul{padding-left:16px;margin:4px 0;max-height:260px;overflow:auto}li{margin:2px 0}.muted{color:#666}</style>
 </head><body>
 <div><b id="mode"></b></div>
-<div class="muted">Queue: <span id="queue"></span> · dropped: <span id="dropped"></span></div>
-<div class="muted">Last push: <span id="last"></span></div>
+<div class="muted">队列：<span id="queue"></span> · 已丢弃：<span id="dropped"></span></div>
+<div class="muted">上次推送：<span id="last"></span></div>
 <p>
-<button data-snooze="60">Pause 1 h</button><button data-snooze="morning">Pause until tomorrow</button><button id="resume">Resume</button><button id="flush">Push queue now</button>
+<button data-snooze="60">暂停 1 小时</button><button data-snooze="morning">暂停到明早</button><button id="resume">恢复</button><button id="flush">立即推送队列</button>
 </p>
-<h2>Recent events</h2><ul id="log"></ul>
-<p><a href="options.html" target="_blank">Settings</a></p>
+<h2>最近事件</h2><ul id="log"></ul>
+<p><a href="options.html" target="_blank">设置</a></p>
 <script type="module" src="popup.js"></script>
 </body></html>

@@ -102,12 +102,12 @@ async function flush(reason, attempt = 1) {
   if (verdict === 'ok') {
     state.queue = rest;
     state.droppedSinceLast = 0;
-    log(state, cfg, { kind: 'sent', note: `${batch.length} event(s), HTTP ${res.status}` });
+    log(state, cfg, { kind: 'sent', note: `${batch.length} 条，HTTP ${res.status}` });
   } else if (verdict === 'auth') {
     state.authPaused = nextAuthPaused(state.authPaused, verdict); // contract C1
-    log(state, cfg, { kind: 'error', note: `HTTP ${res.status}: key rejected, auto-push paused` });
+    log(state, cfg, { kind: 'error', note: `HTTP ${res.status}：密钥被拒绝，已暂停自动推送` });
   } else {
-    log(state, cfg, { kind: 'error', note: `send failed (${res.status || res.error}), attempt ${attempt}` });
+    log(state, cfg, { kind: 'error', note: `发送失败（${res.status || res.error}），第 ${attempt} 次尝试` });
     if (attempt === 1) {
       await saveState(state);
       await updateBadge(cfg, state);
@@ -126,7 +126,7 @@ async function onEvent(raw) {
   if (raw.via === 'notification') state.lastNotificationMs = raw.at || nowMs;
   if (raw.via === 'titleCount' && !shouldKeepTitleEvent(state.lastNotificationMs, raw.at || nowMs)) {
     // F-01: the unread bump is already explained by a notification (or by a muted chat it cannot name).
-    log(state, cfg, { kind: 'drop', note: 'title count covered by notification' });
+    log(state, cfg, { kind: 'drop', note: '未读数变化已由通知覆盖' });
     return saveState(state);
   }
   const res = classify({ ...raw, at: raw.at || nowMs }, cfg, new Date(nowMs));
@@ -137,7 +137,7 @@ async function onEvent(raw) {
   const ev = res.event;
   ev.eventKey = await eventKey(ev);
   if (isDuplicate(state.seen, ev.eventKey, nowMs, cfg.dedupeWindowMin)) {
-    log(state, cfg, { kind: 'drop', note: 'duplicate', chat: ev.chatName });
+    log(state, cfg, { kind: 'drop', note: '重复', chat: ev.chatName });
     return saveState(state);
   }
   state.droppedSinceLast += enqueue(state.queue, ev, cfg.queueMax);

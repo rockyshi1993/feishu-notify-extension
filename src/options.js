@@ -3,6 +3,7 @@ import { DEFAULT_CONFIG, mask } from './lib/core.js';
 
 const $ = (id) => document.getElementById(id);
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DAY_LABELS = { mon: '周一', tue: '周二', wed: '周三', thu: '周四', fri: '周五', sat: '周六', sun: '周日' };
 const LISTS = ['excludeChats', 'includeOnlyChats', 'excludeSenders', 'botSenders', 'priorityKeywords', 'ignoreKeywords'];
 const TEXTS = ['endpointUrl', 'instanceName', 'myName', 'timezone'];
 const SELECTS = ['botPolicy', 'mutedChats', 'mentionMe', 'mentionAll', 'focusedChatPolicy'];
@@ -15,7 +16,7 @@ function buildHours() {
   const tb = $('hours');
   for (const d of DAYS) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${d}</td><td><input type="checkbox" id="wh_${d}_on"></td><td><input type="time" id="wh_${d}_s"></td><td><input type="time" id="wh_${d}_e"></td>`;
+    tr.innerHTML = `<td>${DAY_LABELS[d]}</td><td><label class="row"><input type="checkbox" id="wh_${d}_on"> 工作日</label></td><td><input type="time" id="wh_${d}_s"></td><td><input type="time" id="wh_${d}_e"></td>`;
     tb.appendChild(tr);
   }
 }
@@ -35,7 +36,7 @@ async function load() {
     $(`wh_${d}_on`).checked = !!w; $(`wh_${d}_s`).value = w ? w.start : '09:00'; $(`wh_${d}_e`).value = w ? w.end : '18:30';
   }
   $('apiKey').value = '';
-  $('keyHint').textContent = c.apiKey ? `Saved key: ${mask(c.apiKey)}` : 'No key saved';
+  $('keyHint').textContent = c.apiKey ? `已保存的密钥：${mask(c.apiKey)}` : '尚未保存密钥';
 }
 
 function collect() {
@@ -58,13 +59,13 @@ async function save() {
   const o = collect();
   if (o.endpointUrl) {
     let origin;
-    try { origin = new URL(o.endpointUrl).origin; } catch { status('Invalid URL'); return false; }
+    try { origin = new URL(o.endpointUrl).origin; } catch { status('地址无效'); return false; }
     // Host permission for the receiver must be requested from a user gesture.
-    if (!(await chrome.permissions.request({ origins: [`${origin}/*`] }))) { status('Host permission denied'); return false; }
+    if (!(await chrome.permissions.request({ origins: [`${origin}/*`] }))) { status('未获得访问该域名的权限'); return false; }
   }
   const r = await send({ type: 'save-config', config: o });
-  $('errors').textContent = r.errors && r.errors.length ? `Rejected (kept previous value): ${r.errors.join(', ')}` : '';
-  status('Saved');
+  $('errors').textContent = r.errors && r.errors.length ? `以下设置无效，已保留原值：${r.errors.join(', ')}` : '';
+  status('已保存');
   await load();
   return true;
 }
@@ -73,9 +74,9 @@ buildHours();
 $('save').onclick = save;
 $('test').onclick = async () => {
   if (!(await save())) return;
-  status('Sending…');
+  status('发送中…');
   const r = await send({ type: 'test-push' });
-  status(r.verdict === 'ok' ? `Test OK (HTTP ${r.status}, ${r.ms} ms)` : `Test failed (${r.status || r.error})`);
+  status(r.verdict === 'ok' ? `测试成功（HTTP ${r.status}，${r.ms} 毫秒）` : `测试失败（${r.status || r.error}）`);
 };
 $('export').onclick = async () => {
   const data = await send({ type: 'export-config' });
@@ -90,8 +91,8 @@ $('importFile').onchange = async (e) => {
   if (!f) return;
   try {
     const r = await send({ type: 'import-config', json: await f.text() });
-    $('errors').textContent = r.errors && r.errors.length ? `Ignored fields: ${r.errors.join(', ')}` : '';
-    status('Imported'); await load();
-  } catch (err) { status(`Import failed: ${err.message}`); }
+    $('errors').textContent = r.errors && r.errors.length ? `已忽略的字段：${r.errors.join(', ')}` : '';
+    status('已导入'); await load();
+  } catch (err) { status(`导入失败：${err.message}`); }
 };
 load();

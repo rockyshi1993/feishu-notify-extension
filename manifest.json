@@ -2,13 +2,13 @@
   "manifest_version": 3,
   "name": "Feishu Notify for Grok Bot",
   "version": "1.0.0",
-  "description": "Detects new Feishu web messages and pushes batched notices to a Grok Bot receiver. Notify only: never sends or edits anything in Feishu.",
+  "description": "监测飞书网页新消息，过滤、合并后推送到 Grok Bot 接收地址。只通知：不会在飞书里发送或修改任何内容。",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://*.feishu.cn/*"],
   "optional_host_permissions": ["https://*/*"],
   "background": { "service_worker": "src/background.js", "type": "module" },
   "options_page": "src/options.html",
-  "action": { "default_title": "Feishu Notify", "default_popup": "src/popup.html" },
+  "action": { "default_title": "飞书通知", "default_popup": "src/popup.html" },
   "content_scripts": [
     { "matches": ["https://*.feishu.cn/*"], "js": ["src/lib/context-match.js", "src/main-world.js"], "world": "MAIN", "run_at": "document_start", "all_frames": false },
     { "matches": ["https://*.feishu.cn/*"], "js": ["src/relay.js"], "run_at": "document_start", "all_frames": false }
